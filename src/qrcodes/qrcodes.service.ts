@@ -14,16 +14,26 @@ export class QrcodesService {
   ) {}
 
   async create(dto: createQrDto) {
+    const redirectCode = Math.random().toString(36).substring(2, 10);
+
+    const peramentUrl = `http://localhost:5000/qrcodes/${redirectCode}`;
+
     // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
-    const qrCode = await QRCode.toDataURL(dto.link);
+    const qrCode = await QRCode.toDataURL(peramentUrl);
 
     const data = await this.QrcodeDetailsModel.create({
-      ...dto,
+      gameName: dto.gameName,
+      redirectCode,
+      finalUrl: dto.finalUrl,
       // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
       qrCode,
     });
 
-    return { success: true, message: 'Created', data };
+    return {
+      success: true,
+      message: 'Created',
+      data,
+    };
   }
 
   async findAll(search?: string) {
@@ -45,13 +55,9 @@ export class QrcodesService {
     const item = await this.QrcodeDetailsModel.findById(id);
     if (!item) throw new NotFoundException('Data not found');
 
-    let qrCode = item.qrCode;
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
-    if (dto.link) qrCode = await QRCode.toDataURL(dto.link);
-
     const updated = await this.QrcodeDetailsModel.findByIdAndUpdate(
       id,
-      { ...dto, qrCode },
+      { ...dto },
       { new: true },
     );
 
@@ -63,5 +69,14 @@ export class QrcodesService {
     if (!item) throw new NotFoundException('Data not found');
 
     return { success: true, message: 'Deleted' };
+  }
+
+  async handleRedirect(code: string, res: any) {
+    const item = await this.QrcodeDetailsModel.findOne({ redirectCode: code });
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-return, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
+    if (!item) return res.status(404).send('Invalid QR code');
+
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-return, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
+    return res.redirect(item.finalUrl);
   }
 }

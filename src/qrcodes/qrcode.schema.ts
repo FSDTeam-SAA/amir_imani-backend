@@ -7,8 +7,10 @@ export class QrcodeDetails extends Document {
   gameName: string;
 
   @Prop({ required: true })
-  link: string;
+  redirectCode: string; // 🔥 permanent code used inside QR
 
+  @Prop({ required: true })
+  finalUrl: string; // 🔥 editable multiple times
   @Prop()
   qrCode: string; // Will store the Base64 PNG or hosted image URL
 }

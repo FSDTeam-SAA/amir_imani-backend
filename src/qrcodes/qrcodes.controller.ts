@@ -7,6 +7,7 @@ import {
   Param,
   Delete,
   Query,
+  Res,
 } from '@nestjs/common';
 
 import { createQrDto } from './dto/createQrcode.dto';
@@ -35,5 +36,11 @@ export class QrcodesController {
   @Delete(':id')
   delete(@Param('id') id: string) {
     return this.verificationInfoService.delete(id);
+  }
+
+  @Get(':code')
+  async handleRedirect(@Param('code') code: string, @Res() res: any) {
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-return
+    return this.verificationInfoService.handleRedirect(code, res);
   }
 }
