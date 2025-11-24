@@ -19,7 +19,11 @@ export class QrcodesService {
     const peramentUrl = `http://localhost:5000/qrcodes/${redirectCode}`;
 
     // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
-    const qrCode = await QRCode.toDataURL(peramentUrl);
+    const qrCode = await QRCode.toDataURL(peramentUrl, {
+      width: 800, // bigger size (regulations usually require 400–600px)
+      margin: 2, // lower margin
+      errorCorrectionLevel: 'H', // highest error correction (more stable)
+    });
 
     const data = await this.QrcodeDetailsModel.create({
       gameName: dto.gameName,
