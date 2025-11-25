@@ -9,12 +9,12 @@ export class EmailService {
   constructor(private configService: ConfigService) {
     // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
     this.transporter = nodemailer.createTransport({
-      host: configService.get<string>('SMTP_HOST'),
-      port: configService.get<number>('SMTP_PORT'),
+      host: configService.get<string>('MAIL_HOST'),
+      port: configService.get<number>('MAIL_PORT'),
       secure: false, // true if using 465
       auth: {
-        user: configService.get<string>('SMTP_USER'),
-        pass: configService.get<string>('SMTP_PASS'),
+        user: configService.get<string>('MAIL_USER'),
+        pass: configService.get<string>('MAIL_PASS'),
       },
     });
   }
@@ -23,7 +23,7 @@ export class EmailService {
     try {
       // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
       await this.transporter.sendMail({
-        from: `"No Reply" <${process.env.SMTP_USER}>`,
+        from: `"No Reply" <${process.env.MAIL_USER}>`,
         to,
         subject: 'Password Reset OTP',
         html: `
