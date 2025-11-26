@@ -16,7 +16,7 @@ export class QrcodesService {
   async create(dto: createQrDto) {
     const redirectCode = Math.random().toString(36).substring(2, 10);
 
-    const peramentUrl = `https://amir-imani-backend.onrender.com/qrcodes/${redirectCode}`;
+    const peramentUrl = `https://api.doundogames.com/qrcodes/${redirectCode}`;
 
     // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
     const qrCode = await QRCode.toDataURL(peramentUrl, {
