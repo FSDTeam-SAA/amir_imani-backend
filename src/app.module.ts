@@ -9,6 +9,8 @@ import { EmailModule } from './email/email.module';
 import { ContactUsModule } from './contact-us/contact-us.module';
 import { QrcodesModule } from './qrcodes/qrcodes.module';
 import { ProductsModule } from './products/products.module';
+import { PaymentModule } from './payment/payment.module';
+import { CartModule } from './cart/cart.module';
 
 @Module({
   imports: [
@@ -29,6 +31,8 @@ import { ProductsModule } from './products/products.module';
     ContactUsModule,
     QrcodesModule,
     ProductsModule,
+    CartModule,
+    PaymentModule,
   ],
   controllers: [AppController],
   providers: [AppService],

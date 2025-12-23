@@ -1,8 +1,8 @@
 {
   "info": {
-    "name": "Products API",
-    "_postman_id": "products-api-collection",
-    "description": "Collection for testing Products CRUD APIs",
+    "name": "Amir Imani Backend API",
+    "_postman_id": "amir-imani-api-collection",
+    "description": "Collection for testing Products, Cart, and Payment APIs",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "variable": [
@@ -13,6 +13,26 @@
     },
     {
       "key": "product_id",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "product_id_2",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "product_id_3",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "user_id",
+      "value": "507f1f77bcf86cd799439011",
+      "type": "string"
+    },
+    {
+      "key": "payment_id",
       "value": "",
       "type": "string"
     }
@@ -44,27 +64,27 @@
           "formdata": [
             {
               "key": "productName",
-              "value": "Sample Product",
+              "value": "Premium Yoga Mat",
               "type": "text"
             },
             {
               "key": "price",
-              "value": "99",
+              "value": "4999",
               "type": "text"
             },
             {
               "key": "feature",
-              "value": "High quality material, Durable design",
+              "value": "Non-slip, Eco-friendly, Durable",
               "type": "text"
             },
             {
               "key": "description",
-              "value": "This is a detailed description of the sample product with all its features and benefits.",
+              "value": "Professional grade yoga mat made from sustainable materials. Perfect for yoga, pilates, and meditation. Thickness: 6mm, Lightweight and portable.",
               "type": "text"
             },
             {
               "key": "videoLink",
-              "value": "https://www.youtube.com/watch?v=example",
+              "value": "https://www.youtube.com/watch?v=yoga-demo",
               "type": "text"
             },
             {
@@ -80,6 +100,136 @@
           "path": ["products"]
         },
         "description": "Create a new product with image upload"
+      },
+      "response": []
+    },
+    {
+      "name": "Create Product 2",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "if (pm.response.code === 201) {",
+              "    var jsonData = pm.response.json();",
+              "    if (jsonData.data && jsonData.data._id) {",
+              "        pm.collectionVariables.set('product_id_2', jsonData.data._id);",
+              "    }",
+              "}"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "formdata",
+          "formdata": [
+            {
+              "key": "productName",
+              "value": "Stainless Steel Water Bottle",
+              "type": "text"
+            },
+            {
+              "key": "price",
+              "value": "2499",
+              "type": "text"
+            },
+            {
+              "key": "feature",
+              "value": "Insulated, Leak-proof, Durable",
+              "type": "text"
+            },
+            {
+              "key": "description",
+              "value": "Premium stainless steel water bottle keeps drinks hot for 24 hours or cold for 48 hours. Capacity: 1L, BPA-free, environmentally friendly.",
+              "type": "text"
+            },
+            {
+              "key": "videoLink",
+              "value": "https://www.youtube.com/watch?v=bottle-review",
+              "type": "text"
+            },
+            {
+              "key": "img",
+              "type": "file",
+              "src": []
+            }
+          ]
+        },
+        "url": {
+          "raw": "{{base_url}}/products",
+          "host": ["{{base_url}}"],
+          "path": ["products"]
+        },
+        "description": "Create second product"
+      },
+      "response": []
+    },
+    {
+      "name": "Create Product 3",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "if (pm.response.code === 201) {",
+              "    var jsonData = pm.response.json();",
+              "    if (jsonData.data && jsonData.data._id) {",
+              "        pm.collectionVariables.set('product_id_3', jsonData.data._id);",
+              "    }",
+              "}"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "formdata",
+          "formdata": [
+            {
+              "key": "productName",
+              "value": "Wireless Bluetooth Headphones",
+              "type": "text"
+            },
+            {
+              "key": "price",
+              "value": "7999",
+              "type": "text"
+            },
+            {
+              "key": "feature",
+              "value": "Noise-cancelling, 30-hour battery, Comfortable fit",
+              "type": "text"
+            },
+            {
+              "key": "description",
+              "value": "Premium wireless headphones with active noise cancellation. 30-hour battery life, fast charging, crystal-clear audio quality. Perfect for music lovers and professionals.",
+              "type": "text"
+            },
+            {
+              "key": "videoLink",
+              "value": "https://www.youtube.com/watch?v=headphones-unboxing",
+              "type": "text"
+            },
+            {
+              "key": "img",
+              "type": "file",
+              "src": []
+            }
+          ]
+        },
+        "url": {
+          "raw": "{{base_url}}/products",
+          "host": ["{{base_url}}"],
+          "path": ["products"]
+        },
+        "description": "Create third product"
       },
       "response": []
     },
@@ -190,6 +340,180 @@
           "path": ["contact-us"]
         },
         "description": "Send a contact message to admin"
+      },
+      "response": []
+    },
+    {
+      "name": "Create Cart",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "if (pm.response.code === 201) {",
+              "    var jsonData = pm.response.json();",
+              "    if (jsonData.data && jsonData.data._id) {",
+              "        pm.collectionVariables.set('cart_id', jsonData.data._id);",
+              "    }",
+              "    if (jsonData.data && jsonData.data.userId) {",
+              "        pm.collectionVariables.set('user_id', jsonData.data.userId);",
+              "    }",
+              "}"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"userId\": \"{{user_id}}\",\n  \"productIds\": [\n    {\n      \"productId\": \"{{product_id}}\",\n      \"quantity\": 2\n    },\n    {\n      \"productId\": \"{{product_id_2}}\",\n      \"quantity\": 1\n    },\n    {\n      \"productId\": \"{{product_id_3}}\",\n      \"quantity\": 1\n    }\n  ]\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/cart",
+          "host": ["{{base_url}}"],
+          "path": ["cart"]
+        },
+        "description": "Create a new cart with products"
+      },
+      "response": []
+    },
+    {
+      "name": "Get Cart By User",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{base_url}}/cart/user/{{user_id}}",
+          "host": ["{{base_url}}"],
+          "path": ["cart", "user", "{{user_id}}"]
+        },
+        "description": "Retrieve cart for a specific user"
+      },
+      "response": []
+    },
+    {
+      "name": "Update Cart",
+      "request": {
+        "method": "PUT",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"productIds\": [\n    {\n      \"productId\": \"{{product_id}}\",\n      \"quantity\": 5\n    },\n    {\n      \"productId\": \"{{product_id_2}}\",\n      \"quantity\": 2\n    }\n  ]\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/cart/user/{{user_id}}",
+          "host": ["{{base_url}}"],
+          "path": ["cart", "user", "{{user_id}}"]
+        },
+        "description": "Update cart items for a user"
+      },
+      "response": []
+    },
+    {
+      "name": "Delete Cart",
+      "request": {
+        "method": "DELETE",
+        "header": [],
+        "url": {
+          "raw": "{{base_url}}/cart/user/{{user_id}}",
+          "host": ["{{base_url}}"],
+          "path": ["cart", "user", "{{user_id}}"]
+        },
+        "description": "Delete cart for a user"
+      },
+      "response": []
+    },
+    {
+      "name": "Create Stripe Payment",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "if (pm.response.code === 200 || pm.response.code === 201) {",
+              "    var jsonData = pm.response.json();",
+              "    if (jsonData.data && jsonData.data.id) {",
+              "        pm.collectionVariables.set('payment_id', jsonData.data.id);",
+              "    }",
+              "}"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"userId\": \"{{user_id}}\",\n  \"totalAmount\": 15497,\n  \"paymentType\": \"fullReport\",\n  \"seasonId\": \"507f1f77bcf86cd799439015\",\n  \"successUrl\": \"http://localhost:3000/payment-success\",\n  \"cancelUrl\": \"http://localhost:3000/payment-cancel\",\n  \"description\": \"Payment for full report and products\"\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/payments/stripe/create",
+          "host": ["{{base_url}}"],
+          "path": ["payments", "stripe", "create"]
+        },
+        "description": "Create a Stripe payment session"
+      },
+      "response": []
+    },
+    {
+      "name": "Get All Payments",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{base_url}}/payments",
+          "host": ["{{base_url}}"],
+          "path": ["payments"]
+        },
+        "description": "Get all payments (admin)"
+      },
+      "response": []
+    },
+    {
+      "name": "Get Payments By User",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{base_url}}/payments/user/{{user_id}}",
+          "host": ["{{base_url}}"],
+          "path": ["payments", "user", "{{user_id}}"]
+        },
+        "description": "Get all payments for a specific user"
+      },
+      "response": []
+    },
+    {
+      "name": "Get Payment By ID",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{base_url}}/payments/{{payment_id}}",
+          "host": ["{{base_url}}"],
+          "path": ["payments", "{{payment_id}}"]
+        },
+        "description": "Get a specific payment by ID"
       },
       "response": []
     }
