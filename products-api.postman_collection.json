@@ -1,0 +1,197 @@
+{
+  "info": {
+    "name": "Products API",
+    "_postman_id": "products-api-collection",
+    "description": "Collection for testing Products CRUD APIs",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost:3000",
+      "type": "string"
+    },
+    {
+      "key": "product_id",
+      "value": "",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "Create Product",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "if (pm.response.code === 201) {",
+              "    var jsonData = pm.response.json();",
+              "    if (jsonData.data && jsonData.data._id) {",
+              "        pm.collectionVariables.set('product_id', jsonData.data._id);",
+              "    }",
+              "}"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "formdata",
+          "formdata": [
+            {
+              "key": "productName",
+              "value": "Sample Product",
+              "type": "text"
+            },
+            {
+              "key": "price",
+              "value": "99",
+              "type": "text"
+            },
+            {
+              "key": "feature",
+              "value": "High quality material, Durable design",
+              "type": "text"
+            },
+            {
+              "key": "description",
+              "value": "This is a detailed description of the sample product with all its features and benefits.",
+              "type": "text"
+            },
+            {
+              "key": "videoLink",
+              "value": "https://www.youtube.com/watch?v=example",
+              "type": "text"
+            },
+            {
+              "key": "img",
+              "type": "file",
+              "src": []
+            }
+          ]
+        },
+        "url": {
+          "raw": "{{base_url}}/products",
+          "host": ["{{base_url}}"],
+          "path": ["products"]
+        },
+        "description": "Create a new product with image upload"
+      },
+      "response": []
+    },
+    {
+      "name": "Get All Products",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{base_url}}/products",
+          "host": ["{{base_url}}"],
+          "path": ["products"]
+        },
+        "description": "Retrieve all products"
+      },
+      "response": []
+    },
+    {
+      "name": "Get Product By ID",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{base_url}}/products/{{product_id}}",
+          "host": ["{{base_url}}"],
+          "path": ["products", "{{product_id}}"]
+        },
+        "description": "Retrieve a single product by ID"
+      },
+      "response": []
+    },
+    {
+      "name": "Update Product",
+      "request": {
+        "method": "PUT",
+        "header": [],
+        "body": {
+          "mode": "formdata",
+          "formdata": [
+            {
+              "key": "productName",
+              "value": "Updated Product Name",
+              "type": "text"
+            },
+            {
+              "key": "price",
+              "value": "149",
+              "type": "text"
+            },
+            {
+              "key": "feature",
+              "value": "New features added",
+              "type": "text"
+            },
+            {
+              "key": "description",
+              "value": "Updated description with more details",
+              "type": "text"
+            },
+            {
+              "key": "img",
+              "type": "file",
+              "src": [],
+              "description": "Optional: Upload new image"
+            }
+          ]
+        },
+        "url": {
+          "raw": "{{base_url}}/products/{{product_id}}",
+          "host": ["{{base_url}}"],
+          "path": ["products", "{{product_id}}"]
+        },
+        "description": "Update an existing product with optional image upload"
+      },
+      "response": []
+    },
+    {
+      "name": "Delete Product",
+      "request": {
+        "method": "DELETE",
+        "header": [],
+        "url": {
+          "raw": "{{base_url}}/products/{{product_id}}",
+          "host": ["{{base_url}}"],
+          "path": ["products", "{{product_id}}"]
+        },
+        "description": "Delete a product by ID"
+      },
+      "response": []
+    },
+    {
+      "name": "Contact Us",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"firstName\": \"John\",\n  \"lastName\": \"Doe\",\n  \"email\": \"john.doe@example.com\",\n  \"phoneNumber\": \"+1234567890\",\n  \"message\": \"I have a question about your products.\"\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/contact-us",
+          "host": ["{{base_url}}"],
+          "path": ["contact-us"]
+        },
+        "description": "Send a contact message to admin"
+      },
+      "response": []
+    }
+  ]
+}

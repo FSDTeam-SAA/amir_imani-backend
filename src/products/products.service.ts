@@ -8,16 +8,31 @@ import { Model } from 'mongoose';
 import { Product, ProductDocument } from './product.schema';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
+import { CloudinaryService } from '../cloudinary/cloudinary.service';
 
 @Injectable()
 export class ProductsService {
   constructor(
     @InjectModel(Product.name) private productModel: Model<ProductDocument>,
+    private cloudinaryService: CloudinaryService,
   ) {}
 
-  async createProduct(dto: CreateProductDto): Promise<Product> {
+  async createProduct(
+    dto: CreateProductDto,
+    file?: Express.Multer.File,
+  ): Promise<Product> {
     try {
-      const newProduct = new this.productModel(dto);
+      let imageUrl = dto.img;
+
+      if (file) {
+        const uploadResult = await this.cloudinaryService.uploadImage(file);
+        imageUrl = uploadResult?.secure_url;
+      }
+
+      const newProduct = new this.productModel({
+        ...dto,
+        img: imageUrl,
+      });
       return await newProduct.save();
     } catch (error) {
       throw new BadRequestException('Failed to create product');
@@ -36,16 +51,31 @@ export class ProductsService {
     return product;
   }
 
-  async updateProduct(id: string, dto: UpdateProductDto): Promise<Product> {
-    const updatedProduct = await this.productModel
-      .findByIdAndUpdate(id, dto, { new: true })
-      .exec();
+  async updateProduct(
+    id: string,
+    dto: UpdateProductDto,
+    file?: Express.Multer.File,
+  ): Promise<Product> {
+    try {
+      let imageUrl = dto.img;
 
-    if (!updatedProduct) {
-      throw new NotFoundException(`Product with ID ${id} not found`);
+      if (file) {
+        const uploadResult = await this.cloudinaryService.uploadImage(file);
+        imageUrl = uploadResult?.secure_url;
+      }
+
+      const updatedProduct = await this.productModel
+        .findByIdAndUpdate(id, { ...dto, img: imageUrl }, { new: true })
+        .exec();
+
+      if (!updatedProduct) {
+        throw new NotFoundException(`Product with ID ${id} not found`);
+      }
+
+      return updatedProduct;
+    } catch (error) {
+      throw new BadRequestException('Failed to update product');
     }
-
-    return updatedProduct;
   }
 
   async deleteProduct(id: string): Promise<{ message: string }> {
