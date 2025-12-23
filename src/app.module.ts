@@ -8,6 +8,7 @@ import { AuthModule } from './auth/auth.module';
 import { EmailModule } from './email/email.module';
 import { ContactUsModule } from './contact-us/contact-us.module';
 import { QrcodesModule } from './qrcodes/qrcodes.module';
+import { ProductsModule } from './products/products.module';
 
 @Module({
   imports: [
@@ -27,6 +28,7 @@ import { QrcodesModule } from './qrcodes/qrcodes.module';
     EmailModule,
     ContactUsModule,
     QrcodesModule,
+    ProductsModule,
   ],
   controllers: [AppController],
   providers: [AppService],
