@@ -6,20 +6,23 @@ export const sendEmail = async (
   subject: string,
   html: string,
 ): Promise<void> => {
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call
+  const host = process.env.EMAIL_HOST; // e.g. "smtp.gmail.com"
+  const port = Number(process.env.EMAIL_PORT) || 587;
+  const user = process.env.EMAIL_USER;
+  const pass = process.env.EMAIL_PASSWORD;
+
   const transporter = nodemailer.createTransport({
-    host: process.env.MAIL_HOST, // e.g. "smtp.gmail.com"
-    port: Number(process.env.MAIL_PORT) || 465,
-    secure: true,
+    host,
+    port,
+    secure: port === 465, // use TLS for 465, STARTTLS otherwise
     auth: {
-      user: process.env.MAIL_USER,
-      pass: process.env.MAIL_PASS,
+      user,
+      pass,
     },
   });
 
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-call
   await transporter.sendMail({
-    from: `"Website Contact" <${process.env.MAIL_USER}>`,
+    from: `"Website Contact" <${user}>`,
     to,
     subject,
     html,

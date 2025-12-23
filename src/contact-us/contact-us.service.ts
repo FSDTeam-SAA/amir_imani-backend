@@ -17,11 +17,11 @@ export class ContactUsService {
     `;
 
     await sendEmail(
-      process.env.ADMIN_EMAIL || 'admin@example.com',
+      process.env.ADMIN_EMAIL || 'zihadul708@gmail.com',
       `New Contact Message from ${firstName} ${lastName}`,
       html,
     );
 
-    return { message: 'Message sent successfully ✅' };
+    return { message: 'Message sent successfully' };
   }
 }
