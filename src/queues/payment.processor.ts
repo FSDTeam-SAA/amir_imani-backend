@@ -10,7 +10,11 @@ export class PaymentProcessor extends WorkerHost {
 
   async process(job: Job) {
     try {
-      const { paymentId } = job.data;
+      interface JobData {
+        paymentId: string;
+      }
+
+      const { paymentId }: JobData = job.data as JobData;
 
       console.log(
         `Checking payment status for ${paymentId} (attempt ${job.attemptsMade})`,
