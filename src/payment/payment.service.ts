@@ -31,29 +31,6 @@ export class PaymentService {
     });
   }
 
-  // ✅ SUCCESS URL RESOLVER
-  private getSuccessUrl(paymentType: PaymentType): string {
-    switch (paymentType) {
-      case PaymentType.FULL_REPORT:
-        return (
-          process.env.STRIPE_FULL_REPORT_SUCCESS_URL ||
-          'http://localhost:3000/full-report'
-        );
-
-      case PaymentType.BOOK_SEASON:
-        return (
-          process.env.STRIPE_BOOK_SEASON_SUCCESS_URL ||
-          'http://localhost:3000/success'
-        );
-
-      default:
-        return (
-          process.env.STRIPE_SUCCESS_URL ||
-          'http://localhost:3000/payment/success'
-        );
-    }
-  }
-
   private async schedulePaymentStatusChecks(paymentId: string) {
     const delays = [
       10_000, // 10 sec
@@ -82,12 +59,15 @@ export class PaymentService {
 
   /* Create Stripe Checkout Session */
   async createStripePayment(dto: CreatePaymentDto) {
-    const successUrl = this.getSuccessUrl(dto.paymentType);
+    const successUrl =
+      process.env.STRIPE_CANCEL_URL || 'http://localhost:3000/payment/success';
     console.log('siccessUrl', successUrl);
     const cancelUrl =
       dto.cancelUrl ||
       process.env.STRIPE_CANCEL_URL ||
       'http://localhost:3000/payment/cancel';
+
+    // console.log(1);
 
     // Create a Checkout Session so we can send the hosted payment page URL back to the client
     const session = await this.stripe.checkout.sessions.create({
@@ -97,8 +77,8 @@ export class PaymentService {
         {
           price_data: {
             currency: 'usd',
-            product_data: { name: dto.description || 'Payment' },
             unit_amount: Math.round(dto.totalAmount * 100),
+            product_data: { name: 'My Product' },
           },
           quantity: 1,
         },
@@ -107,14 +87,13 @@ export class PaymentService {
       cancel_url: cancelUrl,
       metadata: {
         userId: dto.userId,
-        seasonId: dto.seasonId || '',
       },
     });
+    // console.log(2);
 
     const payment = await this.paymentModel.create({
       userId: dto.userId,
       seasonId: dto.seasonId,
-      paymentType: dto.paymentType,
       paymentIntent: (session.payment_intent as string) || undefined,
       checkoutSessionId: session.id,
       totalAmount: dto.totalAmount,

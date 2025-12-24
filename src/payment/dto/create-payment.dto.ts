@@ -1,4 +1,4 @@
-import { IsEnum, IsNumber, IsOptional, IsString } from 'class-validator';
+import { IsNumber, IsOptional, IsString } from 'class-validator';
 
 export enum PaymentType {
   FULL_REPORT = 'fullReport',
@@ -24,10 +24,6 @@ export class CreatePaymentDto {
   @IsString()
   cancelUrl?: string;
 
-  @IsOptional()
   @IsString()
-  description?: string;
-
-  @IsEnum(PaymentType)
-  paymentType: PaymentType;
+  'itemIds': string;
 }

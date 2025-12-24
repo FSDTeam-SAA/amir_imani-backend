@@ -11,9 +11,6 @@ export class PaymentRecord {
   @Prop()
   itemIds: string;
 
-  @Prop({ required: true })
-  paymentType: string; // fullReport // BookSeason
-
   @Prop()
   seasonId: string;
 
