@@ -60,7 +60,10 @@ export class PaymentService {
       20_000, // 20 sec
       50_000, // 50 sec
       60_000, // 1 min
+      120_000,
+      240_000,
       300_000, // 5 min
+      600_000,
     ];
 
     for (const delay of delays) {
@@ -129,6 +132,37 @@ export class PaymentService {
 
   /* -------------------- STRIPE STATUS CHECK (BullMQ) -------------------- */
 
+  // async checkStripePaymentStatus(paymentId: string) {
+  //   const payment = await this.paymentModel.findById(paymentId);
+
+  //   if (!payment) return;
+
+  //   // Stop if already resolved
+  //   if (payment.paymentStatus !== 'pending') return;
+
+  //   console.log('payment', payment);
+
+  //   if (!payment.paymentIntent) return;
+
+  //   const intent = await this.stripe.paymentIntents.retrieve(
+  //     payment.paymentIntent,
+  //   );
+
+  //   if (intent.status === 'succeeded') {
+  //     payment.paymentStatus = 'paid';
+  //     await payment.save();
+  //     return;
+  //   }
+
+  //   if (intent.status === 'canceled') {
+  //     payment.paymentStatus = 'failed';
+  //     await payment.save();
+  //     return;
+  //   }
+
+  //   // still pending → next job will retry
+  // }
+
   async checkStripePaymentStatus(paymentId: string) {
     const payment = await this.paymentModel.findById(paymentId);
 
@@ -137,25 +171,46 @@ export class PaymentService {
     // Stop if already resolved
     if (payment.paymentStatus !== 'pending') return;
 
-    if (!payment.paymentIntent) return;
+    if (!payment.checkoutSessionId) return;
 
-    const intent = await this.stripe.paymentIntents.retrieve(
-      payment.paymentIntent,
+    // 1️⃣ Get Checkout Session
+    const session = await this.stripe.checkout.sessions.retrieve(
+      payment.checkoutSessionId,
     );
 
+    if (!session.payment_intent) return;
+
+    const paymentIntentId =
+      typeof session.payment_intent === 'string'
+        ? session.payment_intent
+        : session.payment_intent.id;
+
+    // Save paymentIntent if not stored yet
+    if (!payment.paymentIntent) {
+      payment.paymentIntent = paymentIntentId;
+      await payment.save();
+    }
+
+    // 2️⃣ Retrieve PaymentIntent
+    const intent = await this.stripe.paymentIntents.retrieve(paymentIntentId);
+
+    // 3️⃣ Update DB based on status
     if (intent.status === 'succeeded') {
       payment.paymentStatus = 'paid';
       await payment.save();
       return;
     }
 
-    if (intent.status === 'canceled') {
+    if (
+      intent.status === 'canceled' ||
+      intent.status === 'requires_payment_method'
+    ) {
       payment.paymentStatus = 'failed';
       await payment.save();
       return;
     }
 
-    // still pending → next job will retry
+    // still pending → BullMQ will retry
   }
 
   /* Update payment status (for webhook or manual update) */
