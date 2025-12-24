@@ -4,14 +4,19 @@ import { Model } from 'mongoose';
 import Stripe from 'stripe';
 import { PaymentRecord, PaymentDocument } from './paymentRecord';
 import { CreatePaymentDto, PaymentType } from './dto/create-payment.dto';
+import { InjectQueue } from '@nestjs/bullmq';
+import { Queue } from 'bullmq';
 
 @Injectable()
 export class PaymentService {
   private stripe: Stripe;
 
   constructor(
+    @InjectQueue('payment-status')
+    private readonly paymentQueue: Queue,
+
     @InjectModel(PaymentRecord.name)
-    private paymentModel: Model<PaymentDocument>,
+    private readonly paymentModel: Model<PaymentDocument>,
   ) {
     const stripeSecretKey = process.env.STRIPE_SECRET_KEY;
 
@@ -46,6 +51,29 @@ export class PaymentService {
           process.env.STRIPE_SUCCESS_URL ||
           'http://localhost:3000/payment/success'
         );
+    }
+  }
+
+  private async schedulePaymentStatusChecks(paymentId: string) {
+    const delays = [
+      10_000, // 10 sec
+      20_000, // 20 sec
+      50_000, // 50 sec
+      60_000, // 1 min
+      300_000, // 5 min
+    ];
+
+    for (const delay of delays) {
+      await this.paymentQueue.add(
+        'check-payment-status',
+        { paymentId },
+        {
+          delay,
+          attempts: 1,
+          removeOnComplete: true,
+          removeOnFail: true,
+        },
+      );
     }
   }
 
@@ -90,10 +118,44 @@ export class PaymentService {
       paymentStatus: 'pending',
     });
 
+    /* 🔥 Schedule background status checks */
+    await this.schedulePaymentStatusChecks(payment._id.toString());
+
     return {
       checkoutUrl: session.url, // Hosted Stripe Checkout page
       paymentId: payment._id,
     };
+  }
+
+  /* -------------------- STRIPE STATUS CHECK (BullMQ) -------------------- */
+
+  async checkStripePaymentStatus(paymentId: string) {
+    const payment = await this.paymentModel.findById(paymentId);
+
+    if (!payment) return;
+
+    // Stop if already resolved
+    if (payment.paymentStatus !== 'pending') return;
+
+    if (!payment.paymentIntent) return;
+
+    const intent = await this.stripe.paymentIntents.retrieve(
+      payment.paymentIntent,
+    );
+
+    if (intent.status === 'succeeded') {
+      payment.paymentStatus = 'paid';
+      await payment.save();
+      return;
+    }
+
+    if (intent.status === 'canceled') {
+      payment.paymentStatus = 'failed';
+      await payment.save();
+      return;
+    }
+
+    // still pending → next job will retry
   }
 
   /* Update payment status (for webhook or manual update) */

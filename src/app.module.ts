@@ -11,6 +11,7 @@ import { QrcodesModule } from './qrcodes/qrcodes.module';
 import { ProductsModule } from './products/products.module';
 import { PaymentModule } from './payment/payment.module';
 import { CartModule } from './cart/cart.module';
+import { BullModule } from '@nestjs/bullmq';
 
 @Module({
   imports: [
@@ -24,6 +25,12 @@ import { CartModule } from './cart/cart.module';
         uri: configService.get<string>('DATABASE_URL'),
       }),
       inject: [ConfigService],
+    }),
+    BullModule.forRoot({
+      connection: {
+        host: '127.0.0.1',
+        port: 6379,
+      },
     }),
     UserModule,
     AuthModule,
