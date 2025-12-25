@@ -1,19 +1,30 @@
 import { NestFactory } from '@nestjs/core';
+import { ValidationPipe } from '@nestjs/common'; // 👈 MUST ADD THIS
 import { AppModule } from './app.module';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
-  // ✅ Enable CORS
+
+  // ✅ Enable CORS with restricted origins
   app.enableCors({
     origin: [
       'http://localhost:3000',
       'https://yourfrontenddomain.com',
       'https://amir-imani2025-dashboard.vercel.app',
       'https://admin.doundogames.com',
-    ], // your frontend URL(s)
+    ],
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
-    credentials: true, // if you're using cookies or auth headers
+    credentials: true,
   });
+
+  // ✅ Global Validation
+  app.useGlobalPipes(
+    new ValidationPipe({
+      whitelist: true, // Strips non-DTO properties
+      transform: true, // Converts payloads to DTO instances
+    }),
+  );
+
   await app.listen(process.env.PORT ?? 5000);
 }
 bootstrap();
