@@ -6,6 +6,7 @@ import {
   Param,
   Post,
   Put,
+  Query,
   Res,
   UploadedFile,
   UseInterceptors,
@@ -39,8 +40,12 @@ export class ProductsController {
   }
 
   @Get()
-  async getAllProducts(@Res() res: Response) {
-    const products = await this.productsService.getAllProducts();
+  async getAllProducts(
+    @Res() res: Response,
+    @Query('type') type?: string,
+    @Query('search') search?: string,
+  ) {
+    const products = await this.productsService.getAllProducts(type, search);
 
     sendResponse(res, {
       statusCode: 200,

@@ -4,7 +4,7 @@ import {
   BadRequestException,
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
+import { FilterQuery, Model } from 'mongoose';
 import { Product, ProductDocument } from './product.schema';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
@@ -39,8 +39,18 @@ export class ProductsService {
     }
   }
 
-  async getAllProducts(): Promise<Product[]> {
-    return await this.productModel.find().exec();
+  async getAllProducts(type?: string, search?: string): Promise<Product[]> {
+    const query: FilterQuery<Product> = {};
+
+    if (type) {
+      query.type = type;
+    }
+
+    if (search) {
+      query.name = { $regex: search, $options: 'i' };
+    }
+
+    return await this.productModel.find(query).exec();
   }
 
   async getProductById(id: string): Promise<Product> {
