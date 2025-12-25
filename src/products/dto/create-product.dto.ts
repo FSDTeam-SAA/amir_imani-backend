@@ -1,4 +1,11 @@
-import { IsNotEmpty, IsNumber, IsOptional, IsString } from 'class-validator';
+import {
+  IsEnum,
+  IsNotEmpty,
+  IsNumber,
+  IsOptional,
+  IsString,
+} from 'class-validator';
+import { ProductType } from '../product.schema';
 
 export class CreateProductDto {
   @IsString()
@@ -24,4 +31,9 @@ export class CreateProductDto {
   @IsString()
   @IsOptional()
   img?: string;
+
+  @IsEnum(ProductType, {
+    message: 'Product type must be card or marchandice',
+  })
+  productType: string;
 }

@@ -3,7 +3,7 @@ import { Document } from 'mongoose';
 
 export type ProductDocument = Product & Document;
 
-enum ProductType {
+export enum ProductType {
   CARD = 'card',
   MARCHANDICE = 'marchandice',
 }
