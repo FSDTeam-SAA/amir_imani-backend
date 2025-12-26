@@ -12,6 +12,7 @@ import { ProductsModule } from './products/products.module';
 import { PaymentModule } from './payment/payment.module';
 import { CartModule } from './cart/cart.module';
 import { BullModule } from '@nestjs/bullmq';
+import { BlogModule } from './blog/blog.module';
 
 @Module({
   imports: [
@@ -40,6 +41,7 @@ import { BullModule } from '@nestjs/bullmq';
     ProductsModule,
     CartModule,
     PaymentModule,
+    BlogModule,
   ],
   controllers: [AppController],
   providers: [AppService],
