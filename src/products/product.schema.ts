@@ -8,6 +8,14 @@ export enum ProductType {
   MARCHANDICE = 'marchandice',
 }
 
+export enum ProductSize {
+  S = 's',
+  M = 'm',
+  L = 'l',
+  XL = 'xl',
+  XXL = 'xxl',
+}
+
 @Schema({ timestamps: true })
 export class Product {
   @Prop({ required: true })
@@ -34,6 +42,19 @@ export class Product {
 
   @Prop()
   imgs?: string[];
+
+  @Prop({ required: false })
+  color?: string;
+
+  @Prop({
+    type: String,
+    enum: ProductSize,
+    required: false,
+  })
+  size?: ProductSize;
+
+  @Prop({ required: false, default: 0 })
+  quantity?: number;
 }
 
 export const ProductSchema = SchemaFactory.createForClass(Product);

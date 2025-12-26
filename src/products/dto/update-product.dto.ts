@@ -1,4 +1,11 @@
-import { IsArray, IsNumber, IsOptional, IsString } from 'class-validator';
+import {
+  IsArray,
+  IsEnum,
+  IsNumber,
+  IsOptional,
+  IsString,
+} from 'class-validator';
+import { ProductSize } from '../product.schema';
 
 export class UpdateProductDto {
   @IsString()
@@ -25,4 +32,18 @@ export class UpdateProductDto {
   @IsOptional()
   @IsString({ each: true })
   imgs?: string[];
+
+  @IsString()
+  @IsOptional()
+  color?: string;
+
+  @IsEnum(ProductSize, {
+    message: 'Size must be one of: s, m, l, xl, xxl',
+  })
+  @IsOptional()
+  size?: ProductSize;
+
+  @IsNumber()
+  @IsOptional()
+  quantity?: number;
 }
