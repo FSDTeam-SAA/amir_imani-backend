@@ -1,8 +1,4 @@
-import {
-  Injectable,
-  NotFoundException,
-  BadRequestException,
-} from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { FilterQuery, Model, Types } from 'mongoose';
 import { Product, ProductDocument } from './product.schema';
@@ -15,33 +11,35 @@ import { Cart, CartDocument } from '../cart/cart.schema';
 @Injectable()
 export class ProductsService {
   constructor(
-    @InjectModel(Product.name) private productModel: Model<ProductDocument>,
+    @InjectModel(Product.name)
+    private readonly productModel: Model<ProductDocument>,
     @InjectModel(PaymentRecord.name)
-    private paymentModel: Model<PaymentDocument>,
-    @InjectModel(Cart.name) private cartModel: Model<CartDocument>,
-    private cloudinaryService: CloudinaryService,
+    private readonly paymentModel: Model<PaymentDocument>,
+    @InjectModel(Cart.name) private readonly cartModel: Model<CartDocument>,
+    private readonly cloudinaryService: CloudinaryService,
   ) {}
 
   async createProduct(
     dto: CreateProductDto,
-    file?: Express.Multer.File,
+    files?: Express.Multer.File[],
   ): Promise<Product> {
-    try {
-      let imageUrl = dto.img;
-
-      if (file) {
-        const uploadResult = await this.cloudinaryService.uploadImage(file);
-        imageUrl = uploadResult?.secure_url;
-      }
-
-      const newProduct = new this.productModel({
-        ...dto,
-        img: imageUrl,
-      });
-      return await newProduct.save();
-    } catch (error) {
-      throw new BadRequestException('Failed to create product');
+    const baseImgs = dto.imgs ?? [];
+    let uploadedImgs: string[] = [];
+    if (files?.length) {
+      const uploads = await Promise.all(
+        files.map((f) => this.cloudinaryService.uploadImage(f)),
+      );
+      uploadedImgs = uploads
+        .map((u) => u?.secure_url)
+        .filter(Boolean) as string[];
     }
+    const imgs = Array.from(new Set([...baseImgs, ...uploadedImgs]));
+
+    const newProduct = new this.productModel({
+      ...dto,
+      imgs,
+    });
+    return await newProduct.save();
   }
 
   async getAllProducts(type?: string, search?: string): Promise<Product[]> {
@@ -99,28 +97,29 @@ export class ProductsService {
   async updateProduct(
     id: string,
     dto: UpdateProductDto,
-    file?: Express.Multer.File,
+    files?: Express.Multer.File[],
   ): Promise<Product> {
-    try {
-      let imageUrl = dto.img;
-
-      if (file) {
-        const uploadResult = await this.cloudinaryService.uploadImage(file);
-        imageUrl = uploadResult?.secure_url;
-      }
-
-      const updatedProduct = await this.productModel
-        .findByIdAndUpdate(id, { ...dto, img: imageUrl }, { new: true })
-        .exec();
-
-      if (!updatedProduct) {
-        throw new NotFoundException(`Product with ID ${id} not found`);
-      }
-
-      return updatedProduct;
-    } catch (error) {
-      throw new BadRequestException('Failed to update product');
+    const baseImgs = dto.imgs ?? [];
+    let uploadedImgs: string[] = [];
+    if (files?.length) {
+      const uploads = await Promise.all(
+        files.map((f) => this.cloudinaryService.uploadImage(f)),
+      );
+      uploadedImgs = uploads
+        .map((u) => u?.secure_url)
+        .filter(Boolean) as string[];
     }
+    const imgs = Array.from(new Set([...baseImgs, ...uploadedImgs]));
+
+    const updatedProduct = await this.productModel
+      .findByIdAndUpdate(id, { ...dto, imgs }, { new: true })
+      .exec();
+
+    if (!updatedProduct) {
+      throw new NotFoundException(`Product with ID ${id} not found`);
+    }
+
+    return updatedProduct;
   }
 
   async deleteProduct(id: string): Promise<{ message: string }> {

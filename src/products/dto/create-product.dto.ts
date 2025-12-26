@@ -1,4 +1,5 @@
 import {
+  IsArray,
   IsEnum,
   IsNotEmpty,
   IsNumber,
@@ -28,9 +29,10 @@ export class CreateProductDto {
   @IsOptional()
   videoLink?: string;
 
-  @IsString()
+  @IsArray()
   @IsOptional()
-  img?: string;
+  @IsString({ each: true })
+  imgs?: string[];
 
   @IsEnum(ProductType, {
     message: 'Product type must be card or marchandice',

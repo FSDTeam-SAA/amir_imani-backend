@@ -33,7 +33,7 @@ export class Product {
   videoLink?: string;
 
   @Prop()
-  img?: string;
+  imgs?: string[];
 }
 
 export const ProductSchema = SchemaFactory.createForClass(Product);
