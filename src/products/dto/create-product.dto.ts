@@ -6,6 +6,7 @@ import {
   IsOptional,
   IsString,
 } from 'class-validator';
+import { Type } from 'class-transformer';
 import { ProductType } from '../product.schema';
 
 export class CreateProductDto {
@@ -13,6 +14,7 @@ export class CreateProductDto {
   @IsNotEmpty()
   productName: string;
 
+  @Type(() => Number)
   @IsNumber()
   @IsNotEmpty()
   price: number;
