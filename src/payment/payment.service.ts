@@ -93,6 +93,7 @@ export class PaymentService {
 
     const payment = await this.paymentModel.create({
       userId: dto.userId,
+      itemIds: dto.itemIds,
       seasonId: dto.seasonId,
       paymentIntent: (session.payment_intent as string) || undefined,
       checkoutSessionId: session.id,

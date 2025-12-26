@@ -4,16 +4,21 @@ import {
   BadRequestException,
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { FilterQuery, Model } from 'mongoose';
+import { FilterQuery, Model, Types } from 'mongoose';
 import { Product, ProductDocument } from './product.schema';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { CloudinaryService } from '../cloudinary/cloudinary.service';
+import { PaymentRecord, PaymentDocument } from '../payment/paymentRecord';
+import { Cart, CartDocument } from '../cart/cart.schema';
 
 @Injectable()
 export class ProductsService {
   constructor(
     @InjectModel(Product.name) private productModel: Model<ProductDocument>,
+    @InjectModel(PaymentRecord.name)
+    private paymentModel: Model<PaymentDocument>,
+    @InjectModel(Cart.name) private cartModel: Model<CartDocument>,
     private cloudinaryService: CloudinaryService,
   ) {}
 
@@ -59,6 +64,36 @@ export class ProductsService {
       throw new NotFoundException(`Product with ID ${id} not found`);
     }
     return product;
+  }
+
+  async findPurchasedProducts(userId: string): Promise<Product[]> {
+    const successfulPayments = await this.paymentModel
+      .find({ userId, paymentStatus: 'paid' })
+      .exec();
+
+    if (!successfulPayments.length) {
+      return [];
+    }
+
+    const cartIds = successfulPayments
+      .map((payment) => payment.itemIds)
+      .filter(Boolean)
+      .map((id) => new Types.ObjectId(id));
+
+    const carts = await this.cartModel
+      .find(
+        cartIds.length
+          ? { _id: { $in: cartIds } }
+          : { userId: new Types.ObjectId(userId) },
+      )
+      .exec();
+
+    const productIds = carts.flatMap((cart) =>
+      cart.productIds.map((item) => item.productId),
+    );
+    const uniqueProductIds = [...new Set(productIds.map(String))];
+
+    return this.productModel.find({ _id: { $in: uniqueProductIds } }).exec();
   }
 
   async updateProduct(

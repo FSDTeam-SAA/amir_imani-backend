@@ -55,6 +55,20 @@ export class ProductsController {
     });
   }
 
+  @Get('purchased/:userId')
+  async getPurchasedProducts(
+    @Param('userId') userId: string,
+    @Res() res: Response,
+  ) {
+    const products = await this.productsService.findPurchasedProducts(userId);
+    sendResponse(res, {
+      statusCode: 200,
+      success: true,
+      message: 'Purchased products retrieved successfully',
+      data: products,
+    });
+  }
+
   @Get(':id')
   async getProductById(@Param('id') id: string, @Res() res: Response) {
     const product = await this.productsService.getProductById(id);
