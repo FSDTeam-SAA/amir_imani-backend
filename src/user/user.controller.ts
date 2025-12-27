@@ -29,7 +29,7 @@ export class UserController {
     return {
       success: true,
       message: 'User information retrieved successfully',
-      data: user.toObject(),
+      data: user.toObject() as Record<string, unknown>,
     };
   }
 

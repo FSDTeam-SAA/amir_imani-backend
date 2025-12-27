@@ -24,7 +24,10 @@ export class UserService {
   }
 
   async findById(id: string): Promise<UserDocument | null> {
-    return this.userModel.findById(id).select('-verificationInfo -password');
+    return this.userModel
+      .findById(id)
+      .select('-verificationInfo -password')
+      .exec();
   }
 
   async updateUser(
