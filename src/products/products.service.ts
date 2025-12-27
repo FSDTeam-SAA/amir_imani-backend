@@ -110,6 +110,7 @@ export class ProductsService {
         .filter(Boolean) as string[];
     }
     const imgs = Array.from(new Set([...baseImgs, ...uploadedImgs]));
+    console.log('dto', dto);
 
     const updatedProduct = await this.productModel
       .findByIdAndUpdate(id, { ...dto, imgs }, { new: true })
