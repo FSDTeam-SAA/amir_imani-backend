@@ -9,6 +9,7 @@ async function bootstrap() {
   app.enableCors({
     origin: [
       'http://localhost:3000',
+      'http://localhost:3001',
       'https://yourfrontenddomain.com',
       'https://amir-imani2025-dashboard.vercel.app',
       'https://admin.doundogames.com',
