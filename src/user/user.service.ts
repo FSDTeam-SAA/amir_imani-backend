@@ -7,7 +7,9 @@ import { IUser } from './user.interface';
 
 @Injectable()
 export class UserService {
-  constructor(@InjectModel(User.name) private userModel: Model<UserDocument>) {}
+  constructor(
+    @InjectModel(User.name) readonly userModel: Model<UserDocument>,
+  ) {}
 
   async create(data: Partial<User>): Promise<UserDocument> {
     if (!data.password) throw new Error('Password is required');
@@ -21,8 +23,8 @@ export class UserService {
     return this.userModel.findOne({ email });
   }
 
-  async findById(id: string) {
-    return this.userModel.findById(id);
+  async findById(id: string): Promise<UserDocument | null> {
+    return this.userModel.findById(id).select('-verificationInfo -password');
   }
 
   async updateUser(
@@ -39,6 +41,6 @@ export class UserService {
       },
     );
 
-    return updatedUser ? (updatedUser.toObject() as IUser) : null;
+    return updatedUser ? (updatedUser.toObject() as unknown as IUser) : null;
   }
 }

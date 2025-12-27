@@ -1,5 +1,6 @@
 import {
   Controller,
+  Get,
   Patch,
   Body,
   Param,
@@ -11,7 +12,26 @@ import { UpdateUserDto } from './dto/update-user.dto';
 
 @Controller('user')
 export class UserController {
-  constructor(private userService: UserService) {}
+  constructor(private readonly userService: UserService) {}
+
+  @Get(':id')
+  @HttpCode(HttpStatus.OK)
+  async getUserById(@Param('id') id: string) {
+    const user = await this.userService.findById(id);
+    if (!user) {
+      return {
+        success: false,
+        message: 'User not found',
+        data: null,
+      };
+    }
+
+    return {
+      success: true,
+      message: 'User information retrieved successfully',
+      data: user.toObject(),
+    };
+  }
 
   @Patch(':id')
   @HttpCode(HttpStatus.OK)
