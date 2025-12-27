@@ -15,15 +15,6 @@ export class CartService {
 
   async createCart(dto: CreateCartDto): Promise<Cart> {
     try {
-      // Check if cart already exists for this user
-      const existingCart = await this.cartModel
-        .findOne({ userId: new Types.ObjectId(dto.userId) })
-        .exec();
-
-      if (existingCart) {
-        throw new BadRequestException('Cart already exists for this user');
-      }
-
       const newCart = new this.cartModel({
         userId: new Types.ObjectId(dto.userId),
         productIds: dto.productIds.map((item) => ({
