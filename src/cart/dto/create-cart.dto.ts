@@ -7,6 +7,7 @@ import {
   ValidateNested,
 } from 'class-validator';
 import { Type } from 'class-transformer';
+import { Optional } from '@nestjs/common';
 
 class CartItemDto {
   @IsMongoId()
@@ -16,6 +17,12 @@ class CartItemDto {
   @IsNumber()
   @Min(1)
   quantity: number;
+
+  @Optional()
+  color: string;
+
+  @Optional()
+  size: string;
 }
 
 export class CreateCartDto {

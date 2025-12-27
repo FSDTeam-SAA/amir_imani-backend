@@ -20,6 +20,8 @@ export class CartService {
         productIds: dto.productIds.map((item) => ({
           productId: new Types.ObjectId(item.productId),
           quantity: item.quantity,
+          color: item.color,
+          size: item.size,
         })),
       });
 
@@ -54,6 +56,8 @@ export class CartService {
             productIds: dto.productIds.map((item) => ({
               productId: new Types.ObjectId(item.productId),
               quantity: item.quantity,
+              color: (item as any).color,
+              size: (item as any).size,
             })),
           },
           { new: true },

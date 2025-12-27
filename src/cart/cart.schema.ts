@@ -10,6 +10,12 @@ class CartItem {
 
   @Prop({ required: true, min: 1 })
   quantity: number;
+
+  @Prop()
+  color?: string;
+
+  @Prop()
+  size?: string;
 }
 
 @Schema({ timestamps: true })
