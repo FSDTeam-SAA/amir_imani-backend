@@ -26,6 +26,8 @@ export class AuthController {
       dto.lastName,
       dto.email,
       dto.password,
+      dto.address,
+      dto.phoneNum,
     );
 
     sendResponse(res, {

@@ -24,6 +24,8 @@ export class AuthService {
     lastName: string,
     email: string,
     password: string,
+    address: string,
+    phoneNum: string,
   ) {
     const existing = await this.userService.findByEmail(email);
     if (existing) throw new BadRequestException('Email already registered');
@@ -34,6 +36,8 @@ export class AuthService {
       lastName,
       email,
       password,
+      address,
+      phoneNum,
     });
 
     // 2️⃣ Generate OTP

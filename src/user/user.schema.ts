@@ -52,7 +52,7 @@ export class User {
   email: string;
 
   @Prop()
-  phoneNum: number;
+  phoneNum: string;
 
   @Prop({ type: VerificationInfo, default: {} })
   verificationInfo: VerificationInfo;

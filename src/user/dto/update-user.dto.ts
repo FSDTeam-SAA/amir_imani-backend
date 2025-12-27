@@ -1,7 +1,6 @@
 import {
   IsOptional,
   IsString,
-  IsEmail,
   IsPhoneNumber,
   IsEnum,
   IsDateString,
