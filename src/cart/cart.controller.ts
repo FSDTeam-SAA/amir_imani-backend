@@ -58,17 +58,6 @@ export class CartController {
     });
   }
 
-  @Delete('user/:userId')
-  async deleteCart(@Param('userId') userId: string, @Res() res: Response) {
-    const result = await this.cartService.deleteCart(userId);
-
-    sendResponse(res, {
-      statusCode: 200,
-      success: true,
-      message: result.message,
-    });
-  }
-
   @Delete(':cartId')
   async deleteCartById(@Param('cartId') cartId: string, @Res() res: Response) {
     const result = await this.cartService.deleteCartById(cartId);

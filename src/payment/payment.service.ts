@@ -6,6 +6,7 @@ import { PaymentRecord, PaymentDocument } from './paymentRecord';
 import { CreatePaymentDto } from './dto/create-payment.dto';
 import { InjectQueue } from '@nestjs/bullmq';
 import { Queue } from 'bullmq';
+import { CartService } from '../cart/cart.service';
 
 @Injectable()
 export class PaymentService {
@@ -17,6 +18,8 @@ export class PaymentService {
 
     @InjectModel(PaymentRecord.name)
     private readonly paymentModel: Model<PaymentDocument>,
+
+    private readonly cartService: CartService,
   ) {
     const stripeSecretKey = process.env.STRIPE_SECRET_KEY;
 
@@ -112,37 +115,6 @@ export class PaymentService {
 
   /* -------------------- STRIPE STATUS CHECK (BullMQ) -------------------- */
 
-  // async checkStripePaymentStatus(paymentId: string) {
-  //   const payment = await this.paymentModel.findById(paymentId);
-
-  //   if (!payment) return;
-
-  //   // Stop if already resolved
-  //   if (payment.paymentStatus !== 'pending') return;
-
-  //   console.log('payment', payment);
-
-  //   if (!payment.paymentIntent) return;
-
-  //   const intent = await this.stripe.paymentIntents.retrieve(
-  //     payment.paymentIntent,
-  //   );
-
-  //   if (intent.status === 'succeeded') {
-  //     payment.paymentStatus = 'paid';
-  //     await payment.save();
-  //     return;
-  //   }
-
-  //   if (intent.status === 'canceled') {
-  //     payment.paymentStatus = 'failed';
-  //     await payment.save();
-  //     return;
-  //   }
-
-  //   // still pending → next job will retry
-  // }
-
   async checkStripePaymentStatus(paymentId: string) {
     const payment = await this.paymentModel.findById(paymentId);
 
@@ -178,6 +150,17 @@ export class PaymentService {
     if (intent.status === 'succeeded') {
       payment.paymentStatus = 'paid';
       await payment.save();
+
+      // Delete cart items after successful payment
+      if (payment.itemIds && payment.itemIds.length > 0) {
+        for (const cartId of payment.itemIds) {
+          try {
+            await this.cartService.deleteCartById(cartId);
+          } catch (error) {
+            console.error(`Failed to delete cart ${cartId}:`, error);
+          }
+        }
+      }
       return;
     }
 

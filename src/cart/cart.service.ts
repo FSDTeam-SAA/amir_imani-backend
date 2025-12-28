@@ -15,14 +15,27 @@ export class CartService {
 
   async createCart(dto: CreateCartDto): Promise<Cart> {
     try {
+      const userId = new Types.ObjectId(dto.userId);
+      const newItems = dto.productIds.map((item) => ({
+        productId: new Types.ObjectId(item.productId),
+        quantity: item.quantity,
+        color: item.color,
+        size: item.size,
+      }));
+
+      // Check if cart already exists for this user
+      const existingCart = await this.cartModel.findOne({ userId }).exec();
+
+      if (existingCart) {
+        // Add new items to existing cart
+        existingCart.productIds.push(...newItems);
+        return await existingCart.save();
+      }
+
+      // Create new cart if it doesn't exist
       const newCart = new this.cartModel({
-        userId: new Types.ObjectId(dto.userId),
-        productIds: dto.productIds.map((item) => ({
-          productId: new Types.ObjectId(item.productId),
-          quantity: item.quantity,
-          color: item.color,
-          size: item.size,
-        })),
+        userId,
+        productIds: newItems,
       });
 
       return await newCart.save();
@@ -56,8 +69,8 @@ export class CartService {
             productIds: dto.productIds.map((item) => ({
               productId: new Types.ObjectId(item.productId),
               quantity: item.quantity,
-              color: (item as any).color,
-              size: (item as any).size,
+              color: item.color,
+              size: item.size,
             })),
           },
           { new: true },
@@ -76,18 +89,6 @@ export class CartService {
       }
       throw new BadRequestException('Failed to update cart');
     }
-  }
-
-  async deleteCart(userId: string): Promise<{ message: string }> {
-    const result = await this.cartModel
-      .find({ userId: new Types.ObjectId(userId) })
-      .exec();
-
-    if (!result) {
-      throw new NotFoundException(`Cart not found for user ${userId}`);
-    }
-
-    return { message: 'Cart deleted successfully' };
   }
 
   async deleteCartById(cartId: string): Promise<{ message: string }> {
