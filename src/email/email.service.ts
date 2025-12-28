@@ -1,6 +1,8 @@
 import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import * as nodemailer from 'nodemailer';
 import { ConfigService } from '@nestjs/config';
+import { sendEmail } from '../utils/sendEmail';
+import { NotifyAdminDto } from './dto/notify-admin.dto';
 
 @Injectable()
 export class EmailService {
@@ -38,5 +40,22 @@ export class EmailService {
       console.error(error);
       throw new InternalServerErrorException('Failed to send email');
     }
+  }
+
+  async notifyAdmin(dto: NotifyAdminDto) {
+    const adminEmail = process.env.ADMIN_EMAIL;
+    if (!adminEmail) {
+      throw new InternalServerErrorException('ADMIN_EMAIL is not configured');
+    }
+
+    const html = `
+      <h2>New user details</h2>
+      <p><strong>Name:</strong> ${dto.name}</p>
+      <p><strong>Email:</strong> ${dto.email}</p>
+    `;
+
+    await sendEmail(adminEmail, `New submission from ${dto.name}`, html);
+
+    return { message: 'Admin notified successfully' };
   }
 }
