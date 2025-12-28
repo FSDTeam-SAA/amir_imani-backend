@@ -14,6 +14,7 @@ export class CartService {
   constructor(@InjectModel(Cart.name) private cartModel: Model<CartDocument>) {}
 
   async createCart(dto: CreateCartDto): Promise<Cart> {
+    console.log('first', dto);
     try {
       const userId = new Types.ObjectId(dto.userId);
       const newItems = dto.productIds.map((item) => ({
@@ -27,6 +28,7 @@ export class CartService {
       const existingCart = await this.cartModel.findOne({ userId }).exec();
 
       if (existingCart) {
+        console.log('new items_', newItems);
         // Add new items to existing cart
         existingCart.productIds.push(...newItems);
         return await existingCart.save();
