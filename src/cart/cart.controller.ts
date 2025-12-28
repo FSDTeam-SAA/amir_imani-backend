@@ -68,4 +68,15 @@ export class CartController {
       message: result.message,
     });
   }
+
+  @Delete(':cartId')
+  async deleteCartById(@Param('cartId') cartId: string, @Res() res: Response) {
+    const result = await this.cartService.deleteCartById(cartId);
+
+    sendResponse(res, {
+      statusCode: 200,
+      success: true,
+      message: result.message,
+    });
+  }
 }

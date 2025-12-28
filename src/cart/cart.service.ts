@@ -80,11 +80,23 @@ export class CartService {
 
   async deleteCart(userId: string): Promise<{ message: string }> {
     const result = await this.cartModel
-      .findOneAndDelete({ userId: new Types.ObjectId(userId) })
+      .find({ userId: new Types.ObjectId(userId) })
       .exec();
 
     if (!result) {
       throw new NotFoundException(`Cart not found for user ${userId}`);
+    }
+
+    return { message: 'Cart deleted successfully' };
+  }
+
+  async deleteCartById(cartId: string): Promise<{ message: string }> {
+    const result = await this.cartModel
+      .findByIdAndDelete(new Types.ObjectId(cartId))
+      .exec();
+
+    if (!result) {
+      throw new NotFoundException(`Cart not found for id ${cartId}`);
     }
 
     return { message: 'Cart deleted successfully' };
