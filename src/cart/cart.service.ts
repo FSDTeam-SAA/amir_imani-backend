@@ -102,4 +102,37 @@ export class CartService {
 
     return { message: 'Cart deleted successfully' };
   }
+
+  async deleteProductFromCart(
+    cartId: string,
+    productId: string,
+  ): Promise<Cart> {
+    try {
+      const updatedCart = await this.cartModel
+        .findByIdAndUpdate(
+          new Types.ObjectId(cartId),
+          {
+            $pull: {
+              productIds: {
+                productId: new Types.ObjectId(productId),
+              },
+            },
+          },
+          { new: true },
+        )
+        .populate('productIds.productId')
+        .exec();
+
+      if (!updatedCart) {
+        throw new NotFoundException(`Cart not found for id ${cartId}`);
+      }
+
+      return updatedCart;
+    } catch (error) {
+      if (error instanceof NotFoundException) {
+        throw error;
+      }
+      throw new BadRequestException('Failed to delete product from cart');
+    }
+  }
 }

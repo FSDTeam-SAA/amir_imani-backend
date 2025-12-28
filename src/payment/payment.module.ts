@@ -4,6 +4,7 @@ import { PaymentService } from './payment.service';
 import { MongooseModule } from '@nestjs/mongoose';
 import { PaymentRecord, PaymentSchema } from './paymentRecord';
 import { PaymentQueueModule } from '../queues/payment-queue.module';
+import { CartModule } from '../cart/cart.module';
 
 @Module({
   imports: [
@@ -11,6 +12,7 @@ import { PaymentQueueModule } from '../queues/payment-queue.module';
       { name: PaymentRecord.name, schema: PaymentSchema },
     ]),
     forwardRef(() => PaymentQueueModule),
+    CartModule,
   ],
   controllers: [PaymentController],
   providers: [PaymentService],
