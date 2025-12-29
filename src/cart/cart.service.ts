@@ -14,7 +14,7 @@ export class CartService {
   constructor(@InjectModel(Cart.name) private cartModel: Model<CartDocument>) {}
 
   async createCart(dto: CreateCartDto): Promise<Cart> {
-    console.log('first', dto);
+    // console.log('first', dto);
     try {
       const userId = new Types.ObjectId(dto.userId);
       const newItems = dto.productIds.map((item) => ({
@@ -29,8 +29,27 @@ export class CartService {
 
       if (existingCart) {
         console.log('new items_', newItems);
-        // Add new items to existing cart
-        existingCart.productIds.push(...newItems);
+
+        // Process each new item
+        newItems.forEach((newItem) => {
+          // Find if the same product with same color and size already exists
+          const existingItemIndex = existingCart.productIds.findIndex(
+            (item) =>
+              item.productId.toString() === newItem.productId.toString() &&
+              item.color === newItem.color &&
+              item.size === newItem.size,
+          );
+
+          if (existingItemIndex !== -1) {
+            // Product exists, increment quantity
+            existingCart.productIds[existingItemIndex].quantity +=
+              newItem.quantity;
+          } else {
+            // Product doesn't exist, add as new item
+            existingCart.productIds.push(newItem);
+          }
+        });
+
         return await existingCart.save();
       }
 

@@ -20,7 +20,7 @@ export class CartController {
 
   @Post()
   async createCart(@Body() dto: CreateCartDto, @Res() res: Response) {
-    console.log('first', dto);
+    // console.log('first', dto);
     const cart = await this.cartService.createCart(dto);
 
     sendResponse(res, {
