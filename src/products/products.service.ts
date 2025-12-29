@@ -1,6 +1,8 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { FilterQuery, Model, Types } from 'mongoose';
+import { InjectQueue } from '@nestjs/bullmq';
+import { Queue } from 'bullmq';
 import { Product, ProductDocument } from './product.schema';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
@@ -17,6 +19,8 @@ export class ProductsService {
     private readonly paymentModel: Model<PaymentDocument>,
     @InjectModel(Cart.name) private readonly cartModel: Model<CartDocument>,
     private readonly cloudinaryService: CloudinaryService,
+    @InjectQueue('product-notification')
+    private readonly productNotificationQueue: Queue,
   ) {}
 
   async createProduct(
@@ -39,7 +43,31 @@ export class ProductsService {
       ...dto,
       imgs,
     });
-    return await newProduct.save();
+    const savedProduct = await newProduct.save();
+
+    // Add job to queue to send notifications to all subscribers
+    await this.productNotificationQueue.add(
+      'notify-subscribers',
+      {
+        productId: savedProduct._id.toString(),
+        productName: savedProduct.productName,
+        price: savedProduct.price,
+        feature: savedProduct.feature,
+        description: savedProduct.description,
+        imgs: savedProduct.imgs,
+        productType: savedProduct.productType,
+      },
+      {
+        attempts: 3,
+        backoff: {
+          type: 'exponential',
+          delay: 2000,
+        },
+        removeOnComplete: true,
+      },
+    );
+
+    return savedProduct;
   }
 
   async getAllProducts(type?: string, search?: string): Promise<Product[]> {

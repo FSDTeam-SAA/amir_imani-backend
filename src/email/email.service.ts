@@ -77,4 +77,256 @@ export class EmailService {
       );
     }
   }
+
+  async sendProductNotificationEmail(data: {
+    subscriberName: string;
+    subscriberEmail: string;
+    productName: string;
+    price: number;
+    feature: string;
+    description: string;
+    productType: string;
+    productImage?: string;
+  }) {
+    try {
+      const html = `
+        <!DOCTYPE html>
+        <html lang="en">
+        <head>
+          <meta charset="UTF-8">
+          <meta name="viewport" content="width=device-width, initial-scale=1.0">
+          <style>
+            body {
+              font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+              line-height: 1.6;
+              color: #333;
+              background-color: #f5f5f5;
+              margin: 0;
+              padding: 0;
+            }
+            .container {
+              max-width: 600px;
+              margin: 20px auto;
+              background-color: #ffffff;
+              border-radius: 8px;
+              box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+              overflow: hidden;
+            }
+            .header {
+              background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+              color: white;
+              padding: 40px 20px;
+              text-align: center;
+            }
+            .header h1 {
+              margin: 0;
+              font-size: 28px;
+              font-weight: 600;
+            }
+            .header p {
+              margin: 10px 0 0 0;
+              font-size: 14px;
+              opacity: 0.9;
+            }
+            .content {
+              padding: 40px;
+            }
+            .greeting {
+              font-size: 16px;
+              color: #333;
+              margin-bottom: 20px;
+            }
+            .product-section {
+              margin: 30px 0;
+              border: 1px solid #e0e0e0;
+              border-radius: 8px;
+              overflow: hidden;
+            }
+            .product-image {
+              width: 100%;
+              height: 300px;
+              background-color: #f0f0f0;
+              display: flex;
+              align-items: center;
+              justify-content: center;
+            }
+            .product-image img {
+              width: 100%;
+              height: 100%;
+              object-fit: cover;
+            }
+            .product-details {
+              padding: 25px;
+              background-color: #fafafa;
+            }
+            .product-name {
+              font-size: 22px;
+              font-weight: 600;
+              color: #333;
+              margin: 0 0 10px 0;
+            }
+            .product-meta {
+              display: flex;
+              justify-content: space-between;
+              align-items: center;
+              margin: 15px 0;
+              flex-wrap: wrap;
+            }
+            .price-tag {
+              font-size: 28px;
+              font-weight: 700;
+              color: #667eea;
+            }
+            .type-badge {
+              display: inline-block;
+              background-color: #667eea;
+              color: white;
+              padding: 6px 12px;
+              border-radius: 20px;
+              font-size: 12px;
+              font-weight: 600;
+              text-transform: uppercase;
+            }
+            .feature {
+              background-color: #fff;
+              padding: 15px;
+              border-left: 4px solid #667eea;
+              margin: 15px 0;
+              border-radius: 4px;
+            }
+            .feature-label {
+              font-weight: 600;
+              color: #667eea;
+              font-size: 12px;
+              text-transform: uppercase;
+            }
+            .feature-text {
+              color: #555;
+              margin-top: 5px;
+              font-size: 14px;
+            }
+            .description {
+              background-color: #fff;
+              padding: 15px;
+              border-left: 4px solid #764ba2;
+              margin: 15px 0;
+              border-radius: 4px;
+              line-height: 1.8;
+            }
+            .description-label {
+              font-weight: 600;
+              color: #764ba2;
+              font-size: 12px;
+              text-transform: uppercase;
+            }
+            .description-text {
+              color: #555;
+              margin-top: 8px;
+              font-size: 14px;
+            }
+            .cta-button {
+              display: inline-block;
+              background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+              color: white;
+              padding: 14px 40px;
+              border-radius: 6px;
+              text-decoration: none;
+              font-weight: 600;
+              font-size: 16px;
+              margin: 20px 0;
+              transition: transform 0.2s;
+            }
+            .cta-button:hover {
+              transform: scale(1.05);
+            }
+            .footer {
+              background-color: #f5f5f5;
+              padding: 20px;
+              text-align: center;
+              font-size: 12px;
+              color: #999;
+              border-top: 1px solid #e0e0e0;
+            }
+            .footer p {
+              margin: 5px 0;
+            }
+            .divider {
+              height: 2px;
+              background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+              margin: 20px 0;
+            }
+          </style>
+        </head>
+        <body>
+          <div class="container">
+            <div class="header">
+              <h1>🎉 New Product Launch!</h1>
+              <p>We're excited to share a new addition to our collection</p>
+            </div>
+            
+            <div class="content">
+              <div class="greeting">
+                <p>Hi <strong>${data.subscriberName}</strong>,</p>
+                <p>We just added something amazing to our store. Check it out below:</p>
+              </div>
+
+              <div class="product-section">
+                ${
+                  data.productImage
+                    ? `<div class="product-image">
+                      <img src="${data.productImage}" alt="${data.productName}">
+                    </div>`
+                    : `<div class="product-image" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; font-size: 18px;">
+                      No Image Available
+                    </div>`
+                }
+                <div class="product-details">
+                  <h2 class="product-name">${data.productName}</h2>
+                  
+                  <div class="product-meta">
+                    <div class="price-tag">₹${data.price.toFixed(2)}</div>
+                    <span class="type-badge">${data.productType}</span>
+                  </div>
+
+                  <div class="divider"></div>
+
+                  <div class="feature">
+                    <div class="feature-label">✨ Highlight</div>
+                    <div class="feature-text">${data.feature}</div>
+                  </div>
+
+                  <div class="description">
+                    <div class="description-label">📝 Description</div>
+                    <div class="description-text">${data.description}</div>
+                  </div>
+
+                  <a href="${process.env.FRONTEND_URL || 'https://yourstore.com'}" class="cta-button">Shop Now</a>
+                </div>
+              </div>
+
+              <p style="text-align: center; color: #999; font-size: 12px; margin-top: 30px;">
+                Don't miss out! Limited stock available.
+              </p>
+            </div>
+
+            <div class="footer">
+              <p><strong>Thank you for being part of our community!</strong></p>
+              <p>You received this email because you're subscribed to our product updates.</p>
+              <p>© ${new Date().getFullYear()} Your Store. All rights reserved.</p>
+            </div>
+          </div>
+        </body>
+        </html>
+      `;
+
+      await sendEmail(
+        data.subscriberEmail,
+        `🎉 New Product: ${data.productName}`,
+        html,
+      );
+    } catch (error) {
+      console.error('Error sending product notification email:', error);
+      throw error;
+    }
+  }
 }

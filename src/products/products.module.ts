@@ -1,5 +1,6 @@
 import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
+import { BullModule } from '@nestjs/bullmq';
 import { ProductsController } from './products.controller';
 import { ProductsService } from './products.service';
 import { Product, ProductSchema } from './product.schema';
@@ -15,6 +16,9 @@ import { PaymentRecord, PaymentSchema } from '../payment/paymentRecord';
       { name: PaymentRecord.name, schema: PaymentSchema },
     ]),
     CloudinaryModule,
+    BullModule.registerQueue({
+      name: 'product-notification',
+    }),
   ],
   controllers: [ProductsController],
   providers: [ProductsService],
