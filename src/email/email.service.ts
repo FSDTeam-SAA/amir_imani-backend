@@ -284,7 +284,7 @@ export class EmailService {
                   <h2 class="product-name">${data.productName}</h2>
                   
                   <div class="product-meta">
-                    <div class="price-tag">₹${data.price.toFixed(2)}</div>
+                    <div class="price-tag">${data.price.toFixed(2)}</div>
                     <span class="type-badge">${data.productType}</span>
                   </div>
 
