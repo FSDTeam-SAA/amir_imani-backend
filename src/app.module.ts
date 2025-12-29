@@ -13,6 +13,7 @@ import { PaymentModule } from './payment/payment.module';
 import { CartModule } from './cart/cart.module';
 import { BullModule } from '@nestjs/bullmq';
 import { BlogModule } from './blog/blog.module';
+import { QueuesModule } from './queues/queues.module';
 
 @Module({
   imports: [
@@ -33,6 +34,7 @@ import { BlogModule } from './blog/blog.module';
         port: 6379,
       },
     }),
+    QueuesModule,
     UserModule,
     AuthModule,
     EmailModule,
