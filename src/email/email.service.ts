@@ -1,14 +1,20 @@
 import { Injectable, InternalServerErrorException } from '@nestjs/common';
+import { InjectModel } from '@nestjs/mongoose';
+import { Model } from 'mongoose';
 import * as nodemailer from 'nodemailer';
 import { ConfigService } from '@nestjs/config';
 import { sendEmail } from '../utils/sendEmail';
 import { NotifyAdminDto } from './dto/notify-admin.dto';
+import { Email } from './email.schema';
 
 @Injectable()
 export class EmailService {
   private transporter: nodemailer.Transporter;
 
-  constructor(private configService: ConfigService) {
+  constructor(
+    private configService: ConfigService,
+    @InjectModel(Email.name) private emailModel: Model<Email>,
+  ) {
     // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
     this.transporter = nodemailer.createTransport({
       host: configService.get<string>('MAIL_HOST'),
@@ -48,14 +54,27 @@ export class EmailService {
       throw new InternalServerErrorException('ADMIN_EMAIL is not configured');
     }
 
-    const html = `
-      <h2>New user details</h2>
-      <p><strong>Name:</strong> ${dto.name}</p>
-      <p><strong>Email:</strong> ${dto.email}</p>
-    `;
+    try {
+      // Save notification data to database
+      await this.emailModel.create({
+        name: dto.name,
+        email: dto.email,
+      });
 
-    await sendEmail(adminEmail, `New submission from ${dto.name}`, html);
+      const html = `
+        <h2>New user details</h2>
+        <p><strong>Name:</strong> ${dto.name}</p>
+        <p><strong>Email:</strong> ${dto.email}</p>
+      `;
 
-    return { message: 'Admin notified successfully' };
+      await sendEmail(adminEmail, `New submission from ${dto.name}`, html);
+
+      return { message: 'Admin notified successfully' };
+    } catch (error) {
+      console.error('Error in notifyAdmin:', error);
+      throw new InternalServerErrorException(
+        'Failed to process admin notification',
+      );
+    }
   }
 }
