@@ -46,12 +46,8 @@ export class Product {
   @Prop({ required: false })
   color?: string;
 
-  @Prop({
-    type: String,
-    enum: ProductSize,
-    required: false,
-  })
-  size?: ProductSize;
+  @Prop({ type: String })
+  size?: string;
 
   @Prop({ required: false, default: 0 })
   quantity?: number;
