@@ -104,6 +104,7 @@ export class ProductsService {
     const cartIds = successfulPayments
       .map((payment) => payment.itemIds)
       .filter(Boolean)
+      .flat()
       .map((id) => new Types.ObjectId(id));
 
     const carts = await this.cartModel

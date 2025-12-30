@@ -1,4 +1,4 @@
-import { IsNumber, IsOptional, IsString } from 'class-validator';
+import { IsNumber, IsOptional, IsString, IsArray } from 'class-validator';
 
 export enum PaymentType {
   FULL_REPORT = 'fullReport',
@@ -24,6 +24,8 @@ export class CreatePaymentDto {
   @IsString()
   cancelUrl?: string;
 
-  @IsString()
-  'itemIds': string;
+  @IsOptional()
+  @IsArray()
+  @IsString({ each: true })
+  itemIds?: string[];
 }

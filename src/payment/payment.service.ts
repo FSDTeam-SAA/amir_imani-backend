@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
+import { Model, Types } from 'mongoose';
 import Stripe from 'stripe';
 import { PaymentRecord, PaymentDocument } from './paymentRecord';
 import { CreatePaymentDto } from './dto/create-payment.dto';
@@ -155,7 +155,12 @@ export class PaymentService {
       if (payment.itemIds && payment.itemIds.length > 0) {
         for (const cartId of payment.itemIds) {
           try {
-            await this.cartService.deleteCartById(cartId);
+            // Validate that cartId is a valid ObjectId before attempting deletion
+            if (Types.ObjectId.isValid(cartId)) {
+              await this.cartService.deleteCartById(cartId);
+            } else {
+              console.warn(`Skipping invalid cart ID: ${cartId}`);
+            }
           } catch (error) {
             console.error(`Failed to delete cart ${cartId}:`, error);
           }

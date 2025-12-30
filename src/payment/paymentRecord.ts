@@ -8,8 +8,8 @@ export class PaymentRecord {
   @Prop({ required: true })
   userId: string;
 
-  @Prop()
-  itemIds: string;
+  @Prop({ type: [String], default: [] })
+  itemIds: string[];
 
   @Prop()
   seasonId: string;
