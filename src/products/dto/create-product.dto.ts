@@ -7,7 +7,7 @@ import {
   IsString,
 } from 'class-validator';
 import { Type } from 'class-transformer';
-import { ProductType, ProductSize } from '../product.schema';
+import { ProductType } from '../product.schema';
 
 export class CreateProductDto {
   @IsString()
@@ -45,11 +45,9 @@ export class CreateProductDto {
   @IsOptional()
   color?: string;
 
-  @IsEnum(ProductSize, {
-    message: 'Size must be one of: s, m, l, xl, xxl',
-  })
+  @IsString()
   @IsOptional()
-  size?: ProductSize;
+  size?: string;
 
   @Type(() => Number)
   @IsNumber()
