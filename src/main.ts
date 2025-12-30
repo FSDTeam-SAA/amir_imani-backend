@@ -15,6 +15,7 @@ async function bootstrap() {
       'https://amir-imani20.vercel.app',
       'https://admin.doundogames.com',
       'https://doundogames.com',
+      'https://www.doundogames.com',
     ],
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
     credentials: true,
