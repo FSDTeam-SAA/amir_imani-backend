@@ -6,6 +6,7 @@ import {
   IsString,
 } from 'class-validator';
 import { ProductSize } from '../product.schema';
+import { Type } from 'class-transformer';
 
 export class UpdateProductDto {
   @IsString()
@@ -14,6 +15,7 @@ export class UpdateProductDto {
 
   @IsNumber()
   @IsOptional()
+  @Type(() => Number)
   price?: number;
 
   @IsString()
@@ -45,5 +47,6 @@ export class UpdateProductDto {
 
   @IsNumber()
   @IsOptional()
+  @Type(() => Number)
   quantity?: number;
 }
