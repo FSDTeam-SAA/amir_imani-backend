@@ -43,11 +43,11 @@ export class Product {
   @Prop()
   imgs?: string[];
 
-  @Prop({ required: false })
-  color?: string;
+  @Prop({ type: [String], required: false })
+  color?: string[];
 
-  @Prop({ type: String })
-  size?: string;
+  @Prop({ type: [String], required: false })
+  size?: string[];
 
   @Prop({ required: false, default: 0 })
   quantity?: number;

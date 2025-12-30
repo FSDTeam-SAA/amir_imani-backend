@@ -41,13 +41,15 @@ export class CreateProductDto {
   })
   productType: string;
 
-  @IsString()
+  @IsArray()
   @IsOptional()
-  color?: string;
+  @IsString({ each: true })
+  color?: string[];
 
-  @IsString()
+  @IsArray()
   @IsOptional()
-  size?: string;
+  @IsString({ each: true })
+  size?: string[];
 
   @Type(() => Number)
   @IsNumber()

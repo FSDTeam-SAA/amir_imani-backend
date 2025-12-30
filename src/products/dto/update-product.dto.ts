@@ -1,5 +1,4 @@
 import { IsArray, IsNumber, IsOptional, IsString } from 'class-validator';
-import { ProductSize } from '../product.schema';
 import { Type } from 'class-transformer';
 
 export class UpdateProductDto {
@@ -29,13 +28,15 @@ export class UpdateProductDto {
   @IsString({ each: true })
   imgs?: string[];
 
-  @IsString()
+  @IsArray()
   @IsOptional()
-  color?: string;
+  @IsString({ each: true })
+  color?: string[];
 
-  @IsString()
+  @IsArray()
   @IsOptional()
-  size?: ProductSize;
+  @IsString({ each: true })
+  size?: string[];
 
   @IsNumber()
   @IsOptional()
