@@ -62,7 +62,7 @@ export class QrcodesService {
     const updated = await this.QrcodeDetailsModel.findByIdAndUpdate(
       id,
       { ...dto },
-      { new: true },
+      { new: true, runValidators: true },
     );
 
     return { success: true, message: 'Updated', data: updated };
