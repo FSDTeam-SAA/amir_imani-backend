@@ -28,7 +28,7 @@
     "@nestjs/mapped-types": "^2.1.0",
     "@nestjs/mongoose": "^11.0.3",
     "@nestjs/passport": "^11.0.5",
-    "@nestjs/platform-express": "^11.0.1",
+    "@nestjs/platform-express": "^11.1.28",
     "@types/multer": "^2.0.0",
     "@types/stripe": "^8.0.416",
     "bcrypt": "^6.0.0",
